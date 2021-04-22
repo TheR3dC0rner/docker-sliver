@@ -1,3 +1,4 @@
+  
 FROM golang:1.16.3
 
 ARG BUILD_RFC3339="1970-01-01T00:00:00Z"
@@ -61,35 +62,24 @@ WORKDIR /go/src/github.com/bishopfox/sliver
 RUN ./go-assets.sh
 RUN go mod vendor && make linux && cp -vv sliver-server /opt/sliver-server
 
-RUN ls -lah \
-    && /opt/sliver-server unpack --force \
-    && /go/src/github.com/bishopfox/sliver/go-tests.sh
+#RUN ls -lah \
+#    && /opt/sliver-server unpack --force \
+#    && /go/src/github.com/bishopfox/sliver/go-tests.sh
 RUN make clean \
     # && rm -rf /go/src/* \
     # && rm -rf /home/sliver/.sliver
 
-COPY ./docker-entrypoint.sh /opt/docker-entrypoint.sh
-RUN chmod +x /opt/docker-entrypoint.sh
-RUN chown sliver. /opt/docker-entrypoint.sh
+FROM alpine:latest
+RUN addgroup -S sliver && adduser -S sliver -G sliver &&\
+mkdir -p /home/sliver/ && chown -R sliver:sliver /home/sliver &&\
+apk add --no-cache mingw-w64-gcc mingw-w64-binutils 
 
+# apt-get update && apt-get --no-install-recommends -y install \  
+#  mingw-w64 binutils-mingw-w64 g++-mingw-w64 \
+#  && apt-get clean 
+
+COPY --from=0 /opt/sliver-server /opt/sliver-server
 USER sliver
 WORKDIR /home/sliver/
-ENTRYPOINT [ "/opt/docker-entrypoint.sh" ]
-EXPOSE 80 443 31337
+ENTRYPOINT [ "/bin/sh","-c","/opt/sliver-server operator --name admin1 --lhost 127.0.0.1 && /opt/sliver-server daemon" ]
 
-STOPSIGNAL SIGKILL
-
-# Build-time metadata as defined at http://label-schema.org
-ARG BUILD_DATE
-ARG VCS_REF
-ARG VERSION
-
-LABEL org.label-schema.build-date=$BUILD_DATE \
-  org.label-schema.name="Sliver Docker" \
-  org.label-schema.description="Sliver Docker Build" \
-  org.label-schema.url="https://github.com/war-horse/docker-sliver" \
-  org.label-schema.vcs-ref=$VCS_REF \
-  org.label-schema.vcs-url="https://github.com/war-horse/docker-sliver" \
-  org.label-schema.vendor="warhorse" \
-  org.label-schema.version=$VERSION \
-  org.label-schema.schema-version="1.0"
