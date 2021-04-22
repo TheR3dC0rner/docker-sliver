@@ -1,5 +1,5 @@
   
-FROM golang:1.16.3
+FROM golang:1.16.3 AS build
 
 ARG BUILD_RFC3339="1970-01-01T00:00:00Z"
 ARG COMMIT="local"
@@ -69,7 +69,7 @@ RUN make clean
     # && rm -rf /go/src/* \
     # && rm -rf /home/sliver/.sliver
 
-FROM alpine:latest
+FROM alpine:latest AS runtime
 RUN addgroup -S sliver && adduser -S sliver -G sliver &&\
 mkdir -p /home/sliver/ && chown -R sliver:sliver /home/sliver &&\
 apk add --no-cache mingw-w64-gcc mingw-w64-binutils 
@@ -81,7 +81,7 @@ RUN chown sliver:sliver /home/sliver/docker-entrypoint.sh && chmod +x /home/sliv
 #  mingw-w64 binutils-mingw-w64 g++-mingw-w64 \
 #  && apt-get clean 
 
-COPY --from=0 /opt/sliver-server /opt/sliver-server
+COPY --from=build /opt/sliver-server /opt/sliver-server
 USER sliver
 WORKDIR /home/sliver/
 ENTRYPOINT ./docker-entrypoint.sh
