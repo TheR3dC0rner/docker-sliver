@@ -74,6 +74,9 @@ RUN addgroup -S sliver && adduser -S sliver -G sliver &&\
 mkdir -p /home/sliver/ && chown -R sliver:sliver /home/sliver &&\
 apk add --no-cache mingw-w64-gcc mingw-w64-binutils 
 
+COPY docker-entrypoint.sh /home/sliver/docker-entrypoint.sh
+RUN chown sliver:sliver /home/sliver/docker-entrypoint.sh && chmod +x /home/sliver/docker-entrypoint.sh
+
 # apt-get update && apt-get --no-install-recommends -y install \  
 #  mingw-w64 binutils-mingw-w64 g++-mingw-w64 \
 #  && apt-get clean 
@@ -81,5 +84,5 @@ apk add --no-cache mingw-w64-gcc mingw-w64-binutils
 COPY --from=0 /opt/sliver-server /opt/sliver-server
 USER sliver
 WORKDIR /home/sliver/
-ENTRYPOINT [ "/bin/sh","-c","/opt/sliver-server operator --name admin1 --lhost 127.0.0.1 && /opt/sliver-server daemon" ]
+ENTRYPOINT ./docker-entrypoint.sh
 
