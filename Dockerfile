@@ -84,5 +84,8 @@ RUN chown sliver:sliver /home/sliver/docker-entrypoint.sh && chmod +x /home/sliv
 COPY --from=build /opt/sliver-server /opt/sliver-server
 USER sliver
 WORKDIR /home/sliver/
+
+EXPOSE 80 443 31337
+
 ENTRYPOINT ./docker-entrypoint.sh
 
