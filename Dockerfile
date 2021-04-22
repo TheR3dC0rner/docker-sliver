@@ -37,11 +37,11 @@ RUN mkdir -p /home/sliver/ && chown -R sliver:sliver /home/sliver
 #
 # > Metasploit
 #
-RUN curl https://raw.githubusercontent.com/rapid7/metasploit-omnibus/master/config/templates/metasploit-framework-wrappers/msfupdate.erb > msfinstall \
-  && chmod 755 msfinstall \
-  && ./msfinstall
-RUN mkdir -p ~/.msf4/ && touch ~/.msf4/initial_setup_complete \
-    &&  su -l sliver -c 'mkdir -p ~/.msf4/ && touch ~/.msf4/initial_setup_complete'
+#RUN curl https://raw.githubusercontent.com/rapid7/metasploit-omnibus/master/config/templates/metasploit-framework-wrappers/msfupdate.erb > msfinstall \
+#  && chmod 755 msfinstall \
+#  && ./msfinstall
+#RUN mkdir -p ~/.msf4/ && touch ~/.msf4/initial_setup_complete \
+#    &&  su -l sliver -c 'mkdir -p ~/.msf4/ && touch ~/.msf4/initial_setup_complete'
 
 #
 # > Sliver
@@ -65,7 +65,7 @@ RUN go mod vendor && make linux && cp -vv sliver-server /opt/sliver-server
 #RUN ls -lah \
 #    && /opt/sliver-server unpack --force \
 #    && /go/src/github.com/bishopfox/sliver/go-tests.sh
-RUN make clean \
+RUN make clean 
     # && rm -rf /go/src/* \
     # && rm -rf /home/sliver/.sliver
 
