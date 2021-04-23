@@ -72,7 +72,7 @@ RUN make clean
 FROM alpine:latest AS runtime
 RUN addgroup -S sliver && adduser -S sliver -G sliver &&\
 mkdir -p /home/sliver/ && chown -R sliver:sliver /home/sliver &&\
-apk add --no-cache mingw-w64-gcc mingw-w64-binutils 
+apk add --no-cache mingw-w64-gcc mingw-w64-binutils libc6-compat 
 
 COPY docker-entrypoint.sh /home/sliver/docker-entrypoint.sh
 RUN chown sliver:sliver /home/sliver/docker-entrypoint.sh && chmod +x /home/sliver/docker-entrypoint.sh
